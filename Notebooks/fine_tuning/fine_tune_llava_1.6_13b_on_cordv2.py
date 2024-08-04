@@ -37,6 +37,7 @@ if USE_QLORA or USE_LORA:
         MODEL_ID,
         torch_dtype=torch.float16,
         quantization_config=bnb_config,
+        device_map="auto"
     )
 else:
     # for full fine-tuning, we can speed up the model using Flash Attention
@@ -45,6 +46,7 @@ else:
         MODEL_ID,
         torch_dtype=torch.float16,
         _attn_implementation="flash_attention_2",
+        device_map="auto"
     )
 
 
@@ -250,6 +252,11 @@ class LlavaModelPLModule(L.LightningModule):
     def training_step(self, batch, batch_idx):
 
         input_ids, attention_mask, pixel_values, image_sizes, labels = batch
+        input_ids = input_ids.to(self.device)
+        # attention_mask = attention_mask.to(self.device)
+        # pixel_values = pixel_values.to(self.device)
+        # image_sizes = image_sizes.to(self.device)
+        # labels = labels.to(self.device)
 
         outputs = self.model(input_ids=input_ids,
                             attention_mask=attention_mask,
@@ -266,6 +273,10 @@ class LlavaModelPLModule(L.LightningModule):
     def validation_step(self, batch, batch_idx, dataset_idx=0):
 
         input_ids, attention_mask, pixel_values, image_sizes, answers = batch
+        # attention_mask = attention_mask.to(self.device)
+        # pixel_values = pixel_values.to(self.device)
+        # image_sizes = image_sizes.to(self.device)
+        # labels = labels.to(self.device)
 
         # autoregressively generate token IDs
         generated_ids = self.model.generate(input_ids=input_ids, attention_mask=attention_mask,
@@ -341,7 +352,7 @@ early_stop_callback = EarlyStopping(monitor="val_edit_distance", patience=3, ver
 
 trainer = L.Trainer(
         accelerator="gpu",
-        strategy="pp",
+        strategy="auto",
         devices=2,
         max_epochs=config.get("max_epochs"),
         accumulate_grad_batches=config.get("accumulate_grad_batches"),
@@ -350,7 +361,6 @@ trainer = L.Trainer(
         precision="16-mixed",
         limit_val_batches=5,
         num_sanity_val_steps=0,
-        # logger=wandb_logger,
         callbacks=[
             PushToHubCallback(),
             early_stop_callback],
