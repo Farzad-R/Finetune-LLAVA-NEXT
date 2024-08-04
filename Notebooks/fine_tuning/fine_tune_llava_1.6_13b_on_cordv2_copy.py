@@ -37,6 +37,14 @@ model = get_peft_model(model, lora_config)
 train_dataset = LlavaDataset("naver-clova-ix/cord-v2",  split="train", sort_json_key=False)
 val_dataset = LlavaDataset("naver-clova-ix/cord-v2", split="validation", sort_json_key=False)
 
+counter = 0
+for idx in range(len(train_dataset)):
+    image, target_sequence = train_dataset[idx]
+    # print(f"[INST] <image>\nExtract JSON [\INST] {target_sequence}")
+    counter +=1
+    if counter == 10:
+        break
+
 def train_collate_fn(examples):
     images = []
     texts = []
@@ -52,13 +60,14 @@ def train_collate_fn(examples):
     labels[labels == processor.tokenizer.pad_token_id] = -100
     batch["labels"] = labels
 
-    input_ids = batch["input_ids"]
-    attention_mask = batch["attention_mask"]
-    pixel_values = batch["pixel_values"]
-    image_sizes = batch["image_sizes"]
-    labels = batch["labels"]
+    # input_ids = batch["input_ids"]
+    # attention_mask = batch["attention_mask"]
+    # pixel_values = batch["pixel_values"]
+    # image_sizes = batch["image_sizes"]
+    # labels = batch["labels"]
 
-    return input_ids, attention_mask, pixel_values, image_sizes, labels
+    # return input_ids, attention_mask, pixel_values, image_sizes, labels
+    return batch
 
 
 def eval_collate_fn(examples):
@@ -69,7 +78,6 @@ def eval_collate_fn(examples):
     for example in examples:
         image, ground_truth = example
         images.append(image)
-        # TODO: in the future we can replace this by processor.apply_chat_template
         prompt = f"<s> <image>\nExtract JSON ASSISTANT </s>"
         texts.append(prompt)
         answers.append(ground_truth)
@@ -89,7 +97,6 @@ from torch.utils.data import DataLoader
 import re
 from nltk import edit_distance
 import numpy as np
-
 class LlavaModelPLModule(L.LightningModule):
     def __init__(self, config, processor, model):
         super().__init__()
@@ -101,19 +108,21 @@ class LlavaModelPLModule(L.LightningModule):
 
     def training_step(self, batch, batch_idx):
 
-        input_ids, attention_mask, pixel_values, image_sizes, labels = batch
-        input_ids = input_ids.to(self.device)
-        attention_mask = attention_mask.to(self.device)
-        pixel_values = pixel_values.to(self.device)
-        image_sizes = image_sizes.to(self.device)
-        labels = labels.to(self.device)
+        # input_ids, attention_mask, pixel_values, image_sizes, labels = batch
+        batch = {k: v.to(self.device) for k, v in batch.items()}
+        # input_ids = input_ids.to(self.device)
+        # attention_mask = attention_mask.to(self.device)
+        # pixel_values = pixel_values.to(self.device)
+        # image_sizes = image_sizes.to(self.device)
+        # labels = labels.to(self.device)
 
-        outputs = self.model(input_ids=input_ids,
-                            attention_mask=attention_mask,
-                            pixel_values=pixel_values,
-                            image_sizes=image_sizes,
-                            labels=labels
-                          )
+        # outputs = self.model(input_ids=input_ids,
+        #                     attention_mask=attention_mask,
+        #                     pixel_values=pixel_values,
+        #                     image_sizes=image_sizes,
+        #                     labels=labels
+        #                   )
+        outputs = self.model(**batch)
         loss = outputs.loss
 
         self.log("train_loss", loss)
@@ -122,21 +131,32 @@ class LlavaModelPLModule(L.LightningModule):
 
     def validation_step(self, batch, batch_idx, dataset_idx=0):
 
-        input_ids, attention_mask, pixel_values, image_sizes, answers = batch
-        input_ids = input_ids.to(self.device)
-        attention_mask = attention_mask.to(self.device)
-        pixel_values = pixel_values.to(self.device)
-        image_sizes = image_sizes.to(self.device)
+        batch = {k: v.to(self.device) for k, v in batch.items()}
+
+        # input_ids, attention_mask, pixel_values, image_sizes, answers = batch
+        # input_ids = input_ids.to(self.device)
+        # attention_mask = attention_mask.to(self.device)
+        # pixel_values = pixel_values.to(self.device)
+        # image_sizes = image_sizes.to(self.device)
 
         # autoregressively generate token IDs
-        generated_ids = self.model.generate(input_ids=input_ids, attention_mask=attention_mask,
-                                       pixel_values=pixel_values, image_sizes=image_sizes, max_new_tokens=MAX_LENGTH)
+        # generated_ids = self.model.generate(input_ids=input_ids, attention_mask=attention_mask,
+        #                                pixel_values=pixel_values, image_sizes=image_sizes, max_new_tokens=MAX_LENGTH)
+        generated_ids = self.model.generate(
+            input_ids=batch["input_ids"],
+            attention_mask=batch["attention_mask"],
+            pixel_values=batch["pixel_values"],
+            image_sizes=batch["image_sizes"],
+            max_new_tokens=MAX_LENGTH
+        )
         # turn them back into text, chopping of the prompt
-        # important: we don't skip special tokens here, because we want to see them in the output
-        predictions = self.processor.batch_decode(generated_ids[:, input_ids.size(1):], skip_special_tokens=True)
+        # predictions = self.processor.batch_decode(generated_ids[:, input_ids.size(1):], skip_special_tokens=True)
+        predictions = self.processor.batch_decode(generated_ids[:, batch["input_ids"].size(1):], skip_special_tokens=True)
+
 
         scores = []
-        for pred, answer in zip(predictions, answers):
+        # for pred, answer in zip(predictions, answers):
+        for pred, answer in zip(predictions, batch["labels"]):
             pred = re.sub(r"(?:(?<=>) | (?=</s_))", "", pred)
             scores.append(edit_distance(pred, answer) / max(len(pred), len(answer)))
 

@@ -1,3 +1,4 @@
 myenv
 lightning_logs
 storage
+__pycache__
