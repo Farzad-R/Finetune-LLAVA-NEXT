@@ -37,8 +37,8 @@ if uploaded_file is not None:
 
         with col1:
             # Display the uploaded image
-            width, height = image.size
-            image = image.resize((int(0.3*width), int(0.3*height)))
+            # width, height = image.size
+            # image = image.resize((int(0.3*width), int(0.3*height)))
             st.image(image, caption="Uploaded Image", use_column_width=False)
 
         with col2:
