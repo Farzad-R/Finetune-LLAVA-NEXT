@@ -46,23 +46,20 @@ Fine-Tuning Multimodal LLMs (LLAVA) for Image Data Parsing: [Link](https://youtu
 
 ## Installation
 
-1. Install dependencies from `requirements.txt`:
+1. Clone this repository using:
+    ```bash
+    git clone https://github.com/Farzad-R/Finetune-LLAVA-NEXT.git
+    ```
+
+2. Install dependencies from `requirements.txt`:
    ```bash
    pip install -r requirements.txt
    ```
 
-2. Install additional requirements:
+3. Install additional requirements:
    ```bash
    pip install git+https://github.com/huggingface/transformers.git
    ```
----
-
-## Repository URL
-
-Clone this repository using:
-```bash
-git clone https://github.com/Farzad-R/Finetune-LLAVA-NEXT.git
-```
 ---
 
 ## Additional Resources
