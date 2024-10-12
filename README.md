@@ -7,7 +7,7 @@ This repository demonstrates the process of fine-tuning LLAVA for various tasks,
 ## Video Explanation: 
 A detailed explanation of the project is available in the following YouTube video:
 
-Fine-Tuning Multimodal LLMs (LLAVA) for Image Data Parsing: [Link](https://youtu.be/0pd1ZDT--mU?si=IvVdfgv5CXZx57Dr)
+Fine-Tuning Multimodal LLMs (LLAVA) for Image Data Parsing: [Link](https://youtu.be/0pd1ZDT--mU?si=dII6mGA0tC0hgj3K)
 
 ---
 
