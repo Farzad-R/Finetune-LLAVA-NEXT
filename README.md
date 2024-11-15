@@ -2,6 +2,15 @@
 
 This repository demonstrates the process of fine-tuning LLAVA for various tasks, including data parsing and extracting JSON information from images. It provides comprehensive guidance on how to handle different datasets and fine-tune the model effectively.
 
+---
+
+## Video Explanation: 
+A detailed explanation of the project is available in the following YouTube video:
+
+Fine-Tuning Multimodal LLMs (LLAVA) for Image Data Parsing: [Link](https://youtu.be/0pd1ZDT--mU?si=dII6mGA0tC0hgj3K)
+
+---
+
 ## Repository Structure
 
 ### Notebooks
@@ -33,19 +42,25 @@ This repository demonstrates the process of fine-tuning LLAVA for various tasks,
      ```
   Open the dashboard at [http://localhost:8501/](http://localhost:8501/) and upload sample images from the `data` folder to view the results. You can find 20 sample images in the `data` folder.
 
+---
+
 ## Installation
 
-Install dependencies from `requirements.txt`:
-```bash
-pip install -r requirements.txt
-```
+1. Clone this repository using:
+    ```bash
+    git clone https://github.com/Farzad-R/Finetune-LLAVA-NEXT.git
+    ```
 
-## Repository URL
+2. Install dependencies from `requirements.txt`:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-Clone this repository using:
-```bash
-git clone https://github.com/Farzad-R/Finetune-LLAVA-NEXT.git
-```
+3. Install additional requirements:
+   ```bash
+   pip install git+https://github.com/huggingface/transformers.git
+   ```
+---
 
 ## Additional Resources
 
@@ -60,3 +75,4 @@ git clone https://github.com/Farzad-R/Finetune-LLAVA-NEXT.git
 - LLAVA 1.5 GitHub [repository](https://github.com/haotian-liu/LLaVA).
 
 
+---
