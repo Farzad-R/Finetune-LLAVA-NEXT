@@ -87,3 +87,4 @@ yarl==1.9.4
 pyprojroot
 streamlit
 flask
+transformers==4.44.0

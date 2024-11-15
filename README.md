@@ -35,15 +35,10 @@ This repository demonstrates the process of fine-tuning LLAVA for various tasks,
 
 ## Installation
 
-1. Install dependencies from `requirements.txt`:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-2. Install additional requirements:
-   ```bash
-   pip install git+https://github.com/huggingface/transformers.git
-   ```
+Install dependencies from `requirements.txt`:
+```bash
+pip install -r requirements.txt
+```
 
 ## Repository URL
 
