@@ -73,7 +73,6 @@ smmap==5.0.1
 stack-data==0.6.3
 sympy==1.12
 tokenizers==0.19.1
-tornado==6.4.1
 tqdm==4.66.4
 traitlets==5.14.3
 triton==2.3.1
